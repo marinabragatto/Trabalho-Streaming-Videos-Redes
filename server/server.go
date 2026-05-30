@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"bufio"
@@ -11,7 +11,7 @@ import (
 /* Esse código coloca em execução o servidor na porta :8080 do localhost*/
 // Seria interessante apresentar um catálogo de filmes (trailers) ou o vídeo que for, para o usuário poder escolher o que ele quer
 
-func main(){
+func Serve(){
 	// Listener : interface objeto que escuta conexões
 	listener, err := net.Listen("tcp", ":8080")  // Cria socket tcp
 	if err != nil{

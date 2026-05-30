@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"bufio"
@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func main(){
+func Connect_to_server()(){
 	// Conecta um cliente em yn servidor local na porta 8080
 	conn, err :=  net.Dial("tcp", "localhost:8080")
 	if err != nil{

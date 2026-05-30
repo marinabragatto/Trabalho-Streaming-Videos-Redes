@@ -12,6 +12,7 @@ Em outro terminal, abra a pasta cliente e execute:
 cd client
 go run client.go
 ```
+### 3. Baixe os vídeos pelo drive e coloque no root do repositório
 
 
 
