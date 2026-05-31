@@ -13,7 +13,7 @@ import (
 
 func Serve(){
 	// Listener : interface objeto que escuta conexões
-	listener, err := net.Listen("tcp", ":8080")  // Cria socket tcp
+	listener, err := net.Listen("tcp", "localhost:8080")  // Cria socket tcp
 	if err != nil{
 		fmt.Println(":Erro ao iniciar o servidor", err) // Trata erro ao criar socket
 		return
@@ -59,7 +59,7 @@ func handleConnection(conn net.Conn){
 	video, _ := reader.ReadString('\n') // Le a conexão até \n
 	video = strings.TrimSpace(video)
 
-	path := "../videos/" + video // Caminho até a pasta de arquivos do servidor
+	path := "./videos/" + video // Caminho até a pasta de arquivos do servidor
 	fmt.Println("\tVídeo Solicitado: " + video) // Imprime o pedido desejado no terminal do servidor 
 
 	file, err := os.Open(path)
