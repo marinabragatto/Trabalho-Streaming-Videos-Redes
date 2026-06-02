@@ -30,7 +30,7 @@ func FetchVideo(video string) {
 		return
 	}
 
-	_, err = conn.Write([]byte(video)) // Envia a mensagem de um 
+	
 
 	msg, _ := connReader.ReadString('\n') // lê READY ou ERROR
 	msg = strings.TrimSpace(msg)

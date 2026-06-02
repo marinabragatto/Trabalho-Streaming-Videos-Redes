@@ -61,7 +61,7 @@ func VideoHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "video/mp4")
 
 	// envia o arquivo para o navegador
-	http.ServeFile(w, r, "saida/trailer2.mp4") // QUANDO A FUNÇÃO FETCH RETORNA, ja vai ter baixado o video
+	http.ServeFile(w, r, "buffer/trailer2.mp4") // QUANDO A FUNÇÃO FETCH RETORNA, ja vai ter baixado o video
 }
 
 // exec.Command("cmd", "/c", "start", "http://localhost:3000/video").Start()  TEM que colocar de volta mas não sei onde
