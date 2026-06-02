@@ -9,34 +9,33 @@ import (
 	"strings"
 )
 
-func VideoExists(){
+func VideoExists() {
 	// verifica se o id do trailer existe
 	// se conectando com o servidor
 }
 
-func FetchVideo(video string) {
-
+func Download(object string) {
 	conn, err := net.Dial("tcp", "localhost:8080")
 	if err != nil {
 		fmt.Println("Erro ao se conectar no servidor: ", err)
 		return
 	}
 
-	connReader := bufio.NewReader(conn) // Reader da conexao
-	_, err = conn.Write([]byte(video)) // Envia a mensagem de um video desejado para o servidor
-	// video desejado para o servidor
+	connReader := bufio.NewReader(conn)        // Reader da conexao
+	_, err = conn.Write([]byte(object + "\n")) // Envia a mensagem de um segmentos desejado para o servidor
+	// objeto desejado para o servidor
 	if err != nil {
-		fmt.Println("\tFalha ao enviar nome do vídeo desejado")
+		fmt.Println("\tFalha ao enviar nome do objeto desejado")
+		conn.Close()
 		return
 	}
-
-	
 
 	msg, _ := connReader.ReadString('\n') // lê READY ou ERROR
 	msg = strings.TrimSpace(msg)
 
 	if msg == "ERROR" {
-		fmt.Println("\tVideo nao existe")
+		fmt.Println("\tObjeto nao existe")
+		conn.Close()
 		return
 	}
 
@@ -44,20 +43,15 @@ func FetchVideo(video string) {
 	sizeStr = strings.TrimSpace(sizeStr)
 	size, _ := strconv.Atoi(sizeStr)
 
-	video = strings.TrimSpace(video)
-	path := "saida/" + video
+	path := "./client/segments/" + object
 
 	out, err := os.Create(path)
 	if err != nil {
 		fmt.Println("\tErro ao criar o arquivo localmente: ", err)
+		conn.Close()
 		return
 	}
 
-
-	fmt.Println("Baixando/streaming do vídeo...")
-
-	//abre navegador automaticamente
-	
 	buffer := make([]byte, 4096)
 
 	var received int
@@ -69,8 +63,26 @@ func FetchVideo(video string) {
 	}
 
 	out.Close()
-	fmt.Println("\tDownload finalizado!")
 	conn.Close()
-
 }
 
+func FetchVideo() {
+	os.MkdirAll("./client/segments", os.ModePerm)
+
+	Download("manifest.json")
+	fmt.Println("Manifesto recebido com sucesso")
+
+	segments, err := ReadManifest()
+	if err != nil {
+		fmt.Println("Erro ao ler manifesto", err)
+		return
+	}
+
+	for _, segment := range segments {
+		Download(segment)
+		fmt.Println("\tSegmento recebido finalizado!")
+	}
+
+	fmt.Println("\tTodos os segmentos foram baixados finalizado!")
+
+}
