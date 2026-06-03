@@ -42,14 +42,14 @@ async function montarTelaInicial() {
         const htmlDoVideo = `
             <article class="video-container">
                 <a href="/video?id=${video.id}" class="thumbnail">
-                    <img class="thumbnail-image" src="${video.thumbnail}"
+                    <img class="thumbnail-image" src="/thumbnail?id=${video.id}"
                     width="250"
                     height="150"
                     >
                 </a>
                     <div class="video-description-section"> 
                     <div class="video-details">
-                        <a href="/video?id=${video.id}""  class="video-title">  ${video.nome}</a>
+                        <a href="/video?id=${video.id}"  class="video-title">  ${video.nome}</a>
                     </div>
                     </div>
         </article>

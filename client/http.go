@@ -3,8 +3,8 @@ package client
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"net/http"
+	"strconv"
 )
 
 func StartHTTPServer() {
@@ -21,6 +21,8 @@ func StartHTTPServer() {
 	mux.HandleFunc("/stream", StreamHandler)
 	// Rota Auxiliar para envio do Manifesto para o front-end
 	mux.HandleFunc("/manifest", ManifestHandler)
+	// Rota para a Thumbnail
+	mux.HandleFunc("/thumbnail", ThumbnailHandler)
 
 	fmt.Println("Servidor HTTP iniciado em http://localhost:3000/")
 	srv := &http.Server{
@@ -38,15 +40,15 @@ func StartHTTPServer() {
 
 func CatalogoHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Rota Catalogo")
-	data, err := DownloadTCP("", LIST_VIDEOS,-1)
+	data, err := DownloadTCP("", LIST_VIDEOS, -1)
 	if err != nil {
-        http.Error(w, err.Error(), 500)
-        return
-    }
+		http.Error(w, err.Error(), 500)
+		return
+	}
 	fmt.Println("Voltou do DownloadTCP")
 
-    w.Header().Set("Content-Type", "application/json")
-    w.Write(data)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
 }
 
 func VideoHandler(w http.ResponseWriter, r *http.Request) {
@@ -67,6 +69,8 @@ func StreamHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	w.Header().Set("Content-Type", "video/mp4")
 	w.Write(data)
 	fmt.Println("\tSegmento recebido finalizado!")
 }
@@ -75,14 +79,30 @@ func ManifestHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Rota Envio de Manifesto")
 	id := r.URL.Query().Get("id")
 	id_int, _ := strconv.Atoi(id)
-	
+
 	data, err := DownloadTCP("", GET_MANIFEST, id_int)
-	
+
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
+}
+
+func ThumbnailHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Rota Thumbnail")
+	id := r.URL.Query().Get("id")
+	id_int, err := strconv.Atoi(id)
+
+	data, err := DownloadTCP("", GET_THUMBNAIL, id_int)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "image/jpeg")
 	w.Write(data)
 }

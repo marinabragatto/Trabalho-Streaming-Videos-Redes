@@ -25,9 +25,9 @@ func (v Video) get_id() int {
 }
 
 type Video struct {
-	Id        int   `json:"id"`
+	Id        int    `json:"id"`
 	Nome      string `json:"nome"`
-	Thumbnail string  `json:"thumbnail"`
+	Thumbnail string `json:"thumbnail"`
 	Manifest  string `json:"manifest"`
 }
 
@@ -110,7 +110,6 @@ func handleConnection(conn net.Conn, videos []Video) {
 	request = strings.TrimSpace(request)
 	request_type, _ := strconv.Atoi(request)
 
-
 	if request_type == LIST_VIDEOS {
 
 		data, err := json.Marshal(videos)
@@ -125,11 +124,11 @@ func handleConnection(conn net.Conn, videos []Video) {
 	}
 
 	path := ""
-	video_id, _ := reader.ReadString('\n')  //lendo o video id
+	video_id, _ := reader.ReadString('\n') //lendo o video id
 	video_id = strings.TrimSpace(video_id)
 	video_id_num, _ := strconv.Atoi(video_id)
 
-	if video_id_num > num_videos && video_id_num > 0 { // o video eh de id que nao se conhece
+	if video_id_num > num_videos || video_id_num <= 0 { // o video eh de id que nao se conhece
 		fmt.Print("Erro: não existe esse arquivo na base de dados\n")
 		conn.Write([]byte("ERROR\n"))
 		return
@@ -139,9 +138,8 @@ func handleConnection(conn net.Conn, videos []Video) {
 		path = "./videos/" + video_id + "/manifest.json" // Caminho até a pasta de arquivos do servidor
 	}
 
-	
 	if request_type == GET_THUMBNAIL {
-		path = "./thumbnail/" + video_id + ".jpg" // Caminho até a pasta de arquivos do servidor
+		path = "./thumbnails/" + video_id + ".jpg" // Caminho até a pasta de arquivos do servidor
 
 	}
 	if request_type == GET_SEGMENT {
