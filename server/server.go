@@ -110,11 +110,9 @@ func handleConnection(conn net.Conn, videos []Video) {
 	request = strings.TrimSpace(request)
 	request_type, _ := strconv.Atoi(request)
 
-	print("SERVIDOR: listando videos")
 
 	if request_type == LIST_VIDEOS {
 
-		print("SERVIDOR: listando videos")
 		data, err := json.Marshal(videos)
 		if err != nil {
 			fmt.Println(err)
@@ -126,10 +124,8 @@ func handleConnection(conn net.Conn, videos []Video) {
 		return
 	}
 
-	object, _ := reader.ReadString('\n') // Le a conexão até \n
-	object = strings.TrimSpace(object)
-	fmt.Println(object)
-	video_id, _ := reader.ReadString('\n')
+	path := ""
+	video_id, _ := reader.ReadString('\n')  //lendo o video id
 	video_id = strings.TrimSpace(video_id)
 	video_id_num, _ := strconv.Atoi(video_id)
 
@@ -139,16 +135,19 @@ func handleConnection(conn net.Conn, videos []Video) {
 		return
 	}
 
-	path := ""
 	if request_type == GET_MANIFEST {
 		path = "./videos/" + video_id + "/manifest.json" // Caminho até a pasta de arquivos do servidor
 	}
+
+	
 	if request_type == GET_THUMBNAIL {
 		path = "./thumbnail/" + video_id + ".jpg" // Caminho até a pasta de arquivos do servidor
 
 	}
 	if request_type == GET_SEGMENT {
 		nome_seg, _ := reader.ReadString('\n')
+		nome_seg = strings.TrimSpace(nome_seg)
+
 		path = "./videos/" + video_id + "/" + nome_seg // Caminho até a pasta de arquivos do servidor
 
 	}
@@ -180,6 +179,6 @@ func handleConnection(conn net.Conn, videos []Video) {
 		}
 	}
 
-	fmt.Println("\tArquivo enviado: ", object)
+	fmt.Println("\tArquivo enviado: ", path)
 
 }

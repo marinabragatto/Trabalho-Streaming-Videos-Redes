@@ -1,17 +1,22 @@
 const video = document.getElementById("video-player");
 
+const params = new URLSearchParams(window.location.search);
+const videoId = params.get("id");
+
+console.log("videoId:", videoId);
 let segments = [];
 let current = 0;
 
 // carrega o manifesto
 async function loadManifest() {
 
-    const response = await fetch("/manifest");
+    const response = await fetch(`/manifest?id=${videoId}`);
+    console.log("manifest:", videoId);
 
     const manifest = await response.json();
 
     segments = manifest.segments.map(
-        segment => "/stream?segment=" + segment
+        segment =>  `/stream?id=${videoId}&segment=${segment}`
     );
 
     console.log("Manifest carregado:", segments);

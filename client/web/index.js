@@ -1,5 +1,9 @@
 console.log("INDEX.JS CARREGOU");
 
+
+
+// console.log("videoId:", videoId);
+
 async function buscarCatalogo() {
     console.log("buscar catalogo");
 
@@ -20,23 +24,7 @@ async function buscarCatalogo() {
         console.error("ERRO NO FETCH:", err);
         throw err;
     }
-    // console.log("status:", resposta.status);
-
-    // const texto = await resposta.text();
-
-    // console.log("resposta:", texto);
-
-    // return JSON.parse(texto);
-
-    // const dados = await resposta.json();
-    // return dados
-
-// //     // Por enquanto, vamos simular o que o Go enviaria:
-//     return [
-//         { id: "1", nome: "Toy Story 5", capa: "thumbnails/trailer1.jpg" },
-//         { id: "2", nome: "Vingadores", capa: "thumbnails/trailer2.jpg" },
-//         { id: "3", nome: "Matrix", capa: "thumbnails/trailer3.jpg" }
-//     ];
+  
 }
 
 async function montarTelaInicial() {
@@ -53,7 +41,7 @@ async function montarTelaInicial() {
       
         const htmlDoVideo = `
             <article class="video-container">
-                <a href="/video" class="thumbnail">
+                <a href="/video?id=${video.id}" class="thumbnail">
                     <img class="thumbnail-image" src="${video.thumbnail}"
                     width="250"
                     height="150"
@@ -61,7 +49,7 @@ async function montarTelaInicial() {
                 </a>
                     <div class="video-description-section"> 
                     <div class="video-details">
-                        <a href="/video"  class="video-title">  ${video.nome}</a>
+                        <a href="/video?id=${video.id}""  class="video-title">  ${video.nome}</a>
                     </div>
                     </div>
         </article>

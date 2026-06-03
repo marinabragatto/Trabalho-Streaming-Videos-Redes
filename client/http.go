@@ -75,7 +75,9 @@ func ManifestHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Rota Envio de Manifesto")
 	id := r.URL.Query().Get("id")
 	id_int, _ := strconv.Atoi(id)
+	
 	data, err := DownloadTCP("", GET_MANIFEST, id_int)
+	
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
