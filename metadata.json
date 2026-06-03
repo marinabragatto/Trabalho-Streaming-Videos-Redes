@@ -1,26 +1,26 @@
 [
   {
     "id": 1,
-    "title": "Toy Story 5",
-    "video": "trailer1.mp4",
-    "thumbnail": "trailer1.jpg"
+    "nome": "O Diabo Veste Prada 2",
+    "manifest": "manifest1.json",
+    "thumbnail": "thumbnail1.jpg"
   },
   {
     "id": 2,
-    "title": "O Diabo Veste Prada 2",
-    "video": "trailer2.mp4",
-    "thumbnail": "trailer2.jpg"
+    "nome": "Toy Story 5",
+    "manifest": "manifest2.mp4",
+    "thumbnail": "thumbnail2.jpg"
   },
   {
     "id": 3,
-    "title": "Devoradores De Estrelas",
-    "video": "trailer3.mp4",
-    "thumbnail": "trailer3.jpg"
+    "nome": "Devoradores De Estrelas",
+    "manifest": "manifest3.mp4",
+    "thumbnail": "thumbnail3.jpg"
   },
   {
     "id": 4,
-    "title": "Michael",
-    "video": "trailer4.mp4",
-    "thumbnail": "trailer4.jpg"
+    "nome": "Michael",
+    "manifest": "manifest4.mp4",
+    "thumbnail": "thumbnail4.jpg"
   }
 ]

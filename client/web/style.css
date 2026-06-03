@@ -9,8 +9,6 @@ body{
 }
 
 .video-section{
-    display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(250px,1fr));
     gap: 3rem 1rem;
     padding: 3rem 0;
     margin: 0 1.5rem;
@@ -25,13 +23,14 @@ body{
 .video-container{
     display: flex;
     flex-direction:column;
+    
 }
 
 .video-container:hover{
     opacity: 70%;
 }
 
-.thumbnail{
+.videos{
     position: relative;
 
 }
@@ -99,6 +98,10 @@ body{
     box-shadow:
         0 10px 20px rgba(0,0,0,0.5);
 }
-/* .video-title:hover{
-    color: #aaa;
-} */
+
+#lista-em-alta,
+#lista-favoritos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 3rem 1rem;
+}

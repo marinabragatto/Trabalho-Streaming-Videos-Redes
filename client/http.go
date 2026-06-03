@@ -3,41 +3,30 @@ package client
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"net/http"
-	"os/exec"
 )
 
 func StartHTTPServer() {
-	//servidor HTTP local
 
 	mux := http.NewServeMux()
 
+	// Rota para o Home, entrega interface VAZIA
 	mux.Handle("/", http.FileServer(http.Dir("./client/web")))
+	// Rota de envio de catalogo para o front-end
+	mux.HandleFunc("/api/catalogo", CatalogoHandler)
+	// Rota para o Video Player
+	mux.HandleFunc("/video", VideoHandler)
+	// Rota para o streaming via Segmentos
+	mux.HandleFunc("/stream", StreamHandler)
+	// Rota Auxiliar para envio do Manifesto para o front-end
+	mux.HandleFunc("/manifest", ManifestHandler)
 
-	// Serve os segmentos baixados pelo TCP
-	mux.Handle("/segments/", http.StripPrefix("/segments/", http.FileServer(http.Dir("./client/segments"))))
-
-	//THREAD 1:
-	// HTTP rodando
-
-	// AO MESMO TEMPO
-
-	// THREAD 2:
-	// baixando segmentos
-	go FetchVideo()
-	// segment_000 chega
-	// ↓
-	// player já consegue tocar
-	// enquanto isso segment_001 ainda está baixando
-
+	fmt.Println("Servidor HTTP iniciado em http://localhost:3000/")
 	srv := &http.Server{
 		Addr:    "localhost:3000",
 		Handler: mux,
 	}
-
-	fmt.Println("Servidor HTTP iniciado em http://localhost:3000/index.html")
-
-	exec.Command("cmd", "/c", "start", "http://localhost:3000/index.html").Start()
 
 	err := srv.ListenAndServe()
 	if err != nil {
@@ -45,39 +34,53 @@ func StartHTTPServer() {
 			panic(err)
 		}
 	}
-
 }
 
-// func VideoHandler_v2(w http.ResponseWriter, r *http.Request){
-// 	id := r.PathValue("id")
-	
-// 	if id == "" {
-// 		http.Error(w, "Nenhum vídeo carregado", http.StatusNotFound)
-// 		return
-// 	}
+func CatalogoHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Rota Catalogo")
+	data, err := DownloadTCP("", LIST_VIDEOS,-1)
+	if err != nil {
+        http.Error(w, err.Error(), 500)
+        return
+    }
+	fmt.Println("Voltou do DownloadTCP")
 
-// 	// precisa busccar o video,etc
-// }
+    w.Header().Set("Content-Type", "application/json")
+    w.Write(data)
+}
 
 func VideoHandler(w http.ResponseWriter, r *http.Request) {
-	// Pensei em seguir esse código que pelo url da página
-	// ve o id do video e retorna ele
-	// mas precisa implementar
-	// por enquanto deixei baixando um vídeo fixo!!!
-	// mas a inteção é implementar esse get da url
-
-	
-
-
-	// http.Error(w, "Nenhum vídeo carregado", http.StatusNotFound)
-
-	FetchVideo("trailer2.mp4\n")
-
-	//define o tipo do conteúdo
-	w.Header().Set("Content-Type", "video/mp4")
-
-	// envia o arquivo para o navegador
-	http.ServeFile(w, r, "buffer/trailer2.mp4") // QUANDO A FUNÇÃO FETCH RETORNA, ja vai ter baixado o video
+	fmt.Println("Rota Interface Video-Player")
+	http.ServeFile(w, r, "./client/web/video.html")
 }
 
-// exec.Command("cmd", "/c", "start", "http://localhost:3000/video").Start()  TEM que colocar de volta mas não sei onde
+func StreamHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Rota Stream!")
+
+	segment := r.URL.Query().Get("segment")
+	id := r.URL.Query().Get("id")
+	id_int, _ := strconv.Atoi(id)
+	fmt.Println("(" + segment + ")")
+
+	data, err := DownloadTCP(segment, GET_SEGMENT, id_int)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(data)
+	fmt.Println("\tSegmento recebido finalizado!")
+}
+
+func ManifestHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Rota Envio de Manifesto")
+	id := r.URL.Query().Get("id")
+	id_int, _ := strconv.Atoi(id)
+	data, err := DownloadTCP("", GET_MANIFEST, id_int)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
+}
