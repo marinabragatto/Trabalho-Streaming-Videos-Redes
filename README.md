@@ -25,9 +25,10 @@ O *go*, como já explicado no código, permite que
 * segment_000 chegue -> player já consiga tocar 
 * e enquanto isso -> segment_001 ainda está baixando
 
-### Problemas 
+# Problemas 
 * Os cortes entre os vídeos ficam pouco sutis
 * Precisa enviar as thumbnails também na página home
+* Para ver se ia funcionar fiz o tratamento de protocolo de forma ruim, com muitos ifs, precisa arrumar 
 
 ### Arquitetura 
 * Cliente TCP solicita manifest.json 
