@@ -40,7 +40,7 @@ func StartHTTPServer() {
 
 func CatalogoHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Rota Catalogo")
-	data, err := DownloadTCP("", LIST_VIDEOS, -1)
+	data, err := DoRequestListVideos()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -64,7 +64,7 @@ func StreamHandler(w http.ResponseWriter, r *http.Request) {
 	id_int, _ := strconv.Atoi(id)
 	fmt.Println("(" + segment + ")")
 
-	data, err := DownloadTCP(segment, GET_SEGMENT, id_int)
+	data, err := DoRequestGetSegment(id_int, segment)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -80,7 +80,7 @@ func ManifestHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	id_int, _ := strconv.Atoi(id)
 
-	data, err := DownloadTCP("", GET_MANIFEST, id_int)
+	data, err := DoRequestGetManifest(id_int)
 
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -96,7 +96,7 @@ func ThumbnailHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	id_int, err := strconv.Atoi(id)
 
-	data, err := DownloadTCP("", GET_THUMBNAIL, id_int)
+	data, err := DoRequestGetThumbnail(id_int)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -9,6 +9,10 @@ const (
     GET_SEGMENT   = 4
 )
 
+const (
+	
+)
+
 func Init(){
 	StartHTTPServer()
 }
