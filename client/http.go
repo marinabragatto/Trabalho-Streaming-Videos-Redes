@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 func StartHTTPServer() {
@@ -26,7 +27,7 @@ func StartHTTPServer() {
 
 	fmt.Println("Servidor HTTP iniciado em http://localhost:3000/")
 	srv := &http.Server{
-		Addr:    "localhost:3000",
+		Addr:    "0.0.0.0:3000",
 		Handler: mux,
 	}
 
@@ -60,6 +61,7 @@ func StreamHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Rota Stream!")
 
 	segment := r.URL.Query().Get("segment")
+	fmt.Println("SEGMENTO + ", segment)
 	id := r.URL.Query().Get("id")
 	id_int, _ := strconv.Atoi(id)
 	fmt.Println("(" + segment + ")")
@@ -70,7 +72,9 @@ func StreamHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "video/mp4")
+	if strings.HasSuffix(segment, ".m4s") || strings.HasSuffix(segment, ".mp4") {
+		w.Header().Set("Content-Type", "video/mp4")
+	}
 	w.Write(data)
 	fmt.Println("\tSegmento recebido finalizado!")
 }

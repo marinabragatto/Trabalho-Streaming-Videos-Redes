@@ -16,6 +16,7 @@ import (
 func DownloadData(conn net.Conn) ([]byte, error){
 	connReader := bufio.NewReader(conn) // Reader da conexao
 	msg, _ := connReader.ReadString('\n') // lê READY ou ERROR
+	fmt.Println("opaaa"+msg)
 	msg = strings.TrimSpace(msg)
 	
 	if msg == "ERROR" {
@@ -47,7 +48,8 @@ func DownloadData(conn net.Conn) ([]byte, error){
 
 
 func DoRequestGetManifest(video_id int) ([]byte, error) {
-	conn, err := net.Dial("tcp", "localhost:8080")
+	conn, err := net.Dial("tcp", "192.168.15.7:8080")
+	// conn, err := net.Dial("tcp", "localhost:8080")
 	if err != nil {
 		fmt.Println("Erro ao se conectar no servidor: ", err)
 		return nil, err
