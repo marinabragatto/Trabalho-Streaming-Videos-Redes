@@ -64,6 +64,11 @@ function startMediaSource() {
             const buffered = video.buffered.length > 0 ? video.buffered.end(0) : 0;
             const ahead = buffered - video.currentTime;
 
+            // adiciona 12 segundos ao buffer. 
+            // como cada chunk tem mais ou menos 4 segundos, adiciona 3 chunks
+            // e vai sempre mantendo essa diferenca de 12 segundos a frente, ou seja, sempre
+            // que a menos de 12 segundos de video carregado, adiciona outro chunk pra manter
+            // a diferenca 
             if (ahead < 12) {
                 appendNextVideoSegment();
                 appendNextAudioSegment();
@@ -96,58 +101,6 @@ function startMediaSource() {
         appendNextAudioSegment();
     });
 }
-
-// // Cria o MediaSource e conecta ele ao <video>
-// function startMediaSource() {
-//     mediaSource = new MediaSource();
-
-//     // O src do vídeo agora vira blob, não /stream direto
-//     video.src = URL.createObjectURL(mediaSource);
-
-//     mediaSource.addEventListener("sourceopen", () => {
-//         console.log("MediaSource aberto");
-
-//         // Codec do vídeo
-//         const videoCodec = 'video/mp4; codecs="avc1.4d401e"';
-
-//         // Codec do áudio AAC
-//         const audioCodec = 'audio/mp4; codecs="mp4a.40.2"';
-
-//         videoBuffer = mediaSource.addSourceBuffer(videoCodec);
-//         audioBuffer = mediaSource.addSourceBuffer(audioCodec);
-        
-//         // Quando termina de inserir um pedaço de vídeo, busca o próximo
-//         videoBuffer.addEventListener("updateend", () => {
-//             appendingVideo = false;
-//             appendNextVideoSegment();
-//             tryEndStream();
-//         });
-
-//         // Quando termina de inserir um pedaço de áudio, busca o próximo
-//         audioBuffer.addEventListener("updateend", () => {
-//             appendingAudio = false;
-//             appendNextAudioSegment();
-//             tryEndStream();
-//         });
-
-//         videoBuffer.addEventListener("error", (e) => {
-//             console.error("Erro no videoBuffer:", e);
-//         });
-
-//         audioBuffer.addEventListener("error", (e) => {
-//             console.error("Erro no audioBuffer:", e);
-//         });
-
-//         video.addEventListener("error", () => {
-//             console.error("Erro no elemento video:", video.error);
-//         });
-
-
-//         // Começa carregando init de vídeo e init de áudio
-//         appendNextVideoSegment();
-//         appendNextAudioSegment();
-//     });
-// }
 
 // Adiciona o próximo segmento de vídeo ao buffer de vídeo
 async function appendNextVideoSegment() {

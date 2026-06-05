@@ -19,6 +19,7 @@ func DownloadTCP(object string, request_type int, video_id int) ([]byte, error) 
 
 	fmt.Println("\n\n" + object + "\n\n")
 
+	//COLOCAR AQUI O SEU IP
 	conn, err := net.Dial("tcp", "192.168.15.7:8080")
 	if err != nil {
 		fmt.Println("Erro ao se conectar no servidor: ", err)
