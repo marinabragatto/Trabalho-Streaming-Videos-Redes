@@ -31,7 +31,7 @@ type Video struct {
 	Manifest  string `json:"manifest"`
 }
 
-const num_videos int = 4
+const num_videos int = 5
 
 func Serve() {
 
@@ -55,7 +55,7 @@ func Serve() {
 	imprime_videos(videos)
 
 	// Listener : interface objeto que escuta conexões
-	listener, err := net.Listen("tcp", "localhost:8080") // Cria socket tcp
+	listener, err := net.Listen("tcp", "0.0.0.0:8080") // Cria socket tcp
 	if err != nil {
 		fmt.Println(":Erro ao iniciar o servidor", err) // Trata erro ao criar socket
 		return
@@ -156,6 +156,7 @@ func handleConnection(conn net.Conn, videos []Video) {
 	if err != nil {
 		fmt.Println("Erro ao abrir o arquivo desejado")
 		conn.Write([]byte("ERROR\n"))
+		return
 	}
 	defer file.Close()
 

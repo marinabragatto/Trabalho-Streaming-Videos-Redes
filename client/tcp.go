@@ -19,7 +19,7 @@ func DownloadTCP(object string, request_type int, video_id int) ([]byte, error) 
 
 	fmt.Println("\n\n" + object + "\n\n")
 
-	conn, err := net.Dial("tcp", "localhost:8080")
+	conn, err := net.Dial("tcp", "192.168.15.7:8080")
 	if err != nil {
 		fmt.Println("Erro ao se conectar no servidor: ", err)
 		return nil, err
@@ -62,7 +62,7 @@ func DownloadTCP(object string, request_type int, video_id int) ([]byte, error) 
 	}
 
 	msg, _ := connReader.ReadString('\n') // lê READY ou ERROR
-	fmt.Println("opaaa"+msg)
+	fmt.Println("opaaa" + msg)
 	msg = strings.TrimSpace(msg)
 	if msg == "ERROR" {
 		fmt.Println("\tObjeto nao existe")

@@ -1,124 +1,220 @@
-const video = document.getElementById("video-player");
-const bufferVideo = document.getElementById("video-buffer");
+console.log("VIDEO.JS MEDIASOURCE COM AUDIO");
 
+// Pega o player do HTML
+const video = document.getElementById("video-player");
+
+// Pega o id da URL. Exemplo: /video?id=2
 const params = new URLSearchParams(window.location.search);
 const videoId = params.get("id");
 
-let segments = [];
-let current = 0;
+// MediaSource é a fonte de mídia controlada pelo JavaScript
+let mediaSource;
 
-// carrega o manifesto
+// Buffers separados: um para vídeo e outro para áudio
+let videoBuffer;
+let audioBuffer;
+
+// Listas de segmentos vindas do manifest.json
+let videoSegments = [];
+let audioSegments = [];
+
+// Índices dos próximos segmentos a serem carregados
+let currentVideoSegment = 0;
+let currentAudioSegment = 0;
+
+// Controle para não tentar append enquanto o buffer está ocupado
+let appendingVideo = false;
+let appendingAudio = false;
+
+// Carrega o manifest.json pelo backend Go
 async function loadManifest() {
     const response = await fetch(`/manifest?id=${videoId}`);
     const manifest = await response.json();
 
-    segments = manifest.segments.map(
-        segment => `/stream?id=${videoId}&segment=${segment}`
-    );
+    videoSegments = manifest.video;
+    audioSegments = manifest.audio;
 
-    playSegment(current);
+    console.log("Segmentos de vídeo:", videoSegments);
+    console.log("Segmentos de áudio:", audioSegments);
+
+    startMediaSource();
 }
 
-//carrega proximo segmento antes do atual acabar
-function preloadNextSegment() {
-    const next = current + 1;
+// Cria o MediaSource e conecta ele ao <video>
+function startMediaSource() {
+    mediaSource = new MediaSource();
 
-    if (next < segments.length) {
-        bufferVideo.src = segments[next];
-        bufferVideo.load();
+    // O src do vídeo agora vira blob, não /stream direto
+    video.src = URL.createObjectURL(mediaSource);
 
-        console.log("Pré-carregando:", segments[next]);
-    }
+    mediaSource.addEventListener("sourceopen", () => {
+    
+        console.log("MediaSource aberto");
+
+        // Codec do vídeo
+        const videoCodec = 'video/mp4; codecs="avc1.4d401e"';
+
+        // Codec do áudio AAC
+        const audioCodec = 'audio/mp4; codecs="mp4a.40.2"';
+
+        videoBuffer = mediaSource.addSourceBuffer(videoCodec);
+        audioBuffer = mediaSource.addSourceBuffer(audioCodec);
+
+        video.addEventListener("timeupdate", () => {
+            const buffered = video.buffered.length > 0 ? video.buffered.end(0) : 0;
+            const ahead = buffered - video.currentTime;
+
+            if (ahead < 12) {
+                appendNextVideoSegment();
+                appendNextAudioSegment();
+            }
+        });
+
+        video.addEventListener("waiting", () => {
+            appendNextVideoSegment();
+            appendNextAudioSegment();
+        });
+
+        // Só reseta o flag de "ocupado", não chama o próximo segmento
+        videoBuffer.addEventListener("updateend", () => {
+            appendingVideo = false;
+            tryEndStream();
+        });
+
+        audioBuffer.addEventListener("updateend", () => {
+            appendingAudio = false;
+            tryEndStream();
+        });
+
+        videoBuffer.addEventListener("error", (e) => console.error("Erro no videoBuffer:", e));
+        audioBuffer.addEventListener("error", (e) => console.error("Erro no audioBuffer:", e));
+        video.addEventListener("error", () => console.error("Erro no elemento video:", video.error));
+
+        // Carga inicial — sem isso o vídeo não começa pois o timeupdate
+        // só dispara depois que o vídeo já está tocando
+        appendNextVideoSegment();
+        appendNextAudioSegment();
+    });
 }
 
-// toca um segmento
-function playSegment(index) {
-    if (index >= segments.length) {
-        console.log("Fim do vídeo");
-        return;
-    }
+// // Cria o MediaSource e conecta ele ao <video>
+// function startMediaSource() {
+//     mediaSource = new MediaSource();
 
-    video.src = segments[index];
-    video.load();
+//     // O src do vídeo agora vira blob, não /stream direto
+//     video.src = URL.createObjectURL(mediaSource);
 
-    video.oncanplay = () => {
-        video.play();
-        preloadNextSegment();
-    };
+//     mediaSource.addEventListener("sourceopen", () => {
+//         console.log("MediaSource aberto");
 
-    console.log("Reproduzindo:", segments[index]);
+//         // Codec do vídeo
+//         const videoCodec = 'video/mp4; codecs="avc1.4d401e"';
+
+//         // Codec do áudio AAC
+//         const audioCodec = 'audio/mp4; codecs="mp4a.40.2"';
+
+//         videoBuffer = mediaSource.addSourceBuffer(videoCodec);
+//         audioBuffer = mediaSource.addSourceBuffer(audioCodec);
+        
+//         // Quando termina de inserir um pedaço de vídeo, busca o próximo
+//         videoBuffer.addEventListener("updateend", () => {
+//             appendingVideo = false;
+//             appendNextVideoSegment();
+//             tryEndStream();
+//         });
+
+//         // Quando termina de inserir um pedaço de áudio, busca o próximo
+//         audioBuffer.addEventListener("updateend", () => {
+//             appendingAudio = false;
+//             appendNextAudioSegment();
+//             tryEndStream();
+//         });
+
+//         videoBuffer.addEventListener("error", (e) => {
+//             console.error("Erro no videoBuffer:", e);
+//         });
+
+//         audioBuffer.addEventListener("error", (e) => {
+//             console.error("Erro no audioBuffer:", e);
+//         });
+
+//         video.addEventListener("error", () => {
+//             console.error("Erro no elemento video:", video.error);
+//         });
+
+
+//         // Começa carregando init de vídeo e init de áudio
+//         appendNextVideoSegment();
+//         appendNextAudioSegment();
+//     });
+// }
+
+// Adiciona o próximo segmento de vídeo ao buffer de vídeo
+async function appendNextVideoSegment() {
+    if (appendingVideo) return;
+    if (!videoBuffer || videoBuffer.updating) return;
+
+    if (currentVideoSegment >= videoSegments.length) return;
+
+    const segmentName = videoSegments[currentVideoSegment];
+    currentVideoSegment++;
+
+    appendingVideo = true;
+
+    const data = await fetchSegment(segmentName);
+    videoBuffer.appendBuffer(data);
 }
 
-video.addEventListener("ended", () => {
-    current++;
+// Adiciona o próximo segmento de áudio ao buffer de áudio
+async function appendNextAudioSegment() {
+    if (appendingAudio) return;
+    if (!audioBuffer || audioBuffer.updating) return;
 
-    if (current >= segments.length) {
-        console.log("Fim do vídeo");
-        return;
+    if (currentAudioSegment >= audioSegments.length) return;
+
+    const segmentName = audioSegments[currentAudioSegment];
+    currentAudioSegment++;
+
+    appendingAudio = true;
+
+    const data = await fetchSegment(segmentName);
+    audioBuffer.appendBuffer(data);
+}
+
+// Busca um segmento no backend Go.
+// O backend usa TCP para buscar no servidor e devolve os bytes ao navegador.
+async function fetchSegment(segmentName) {
+    const url = `/stream?id=${videoId}&segment=${segmentName}`;
+    console.log("Carregando:", url);
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error("Erro ao carregar segmento: " + segmentName);
     }
 
-    video.src = bufferVideo.src;
-    video.load();
+    return await response.arrayBuffer();
+}
 
-    video.oncanplay = () => {
-        video.play();
-        preloadNextSegment();
-    };
-});
+// Só finaliza o MediaSource quando vídeo e áudio acabaram
+function tryEndStream() {
+    const videoEnded = currentVideoSegment >= videoSegments.length;
+    const audioEnded = currentAudioSegment >= audioSegments.length;
+
+    const buffersIdle =
+        videoBuffer &&
+        audioBuffer &&
+        !videoBuffer.updating &&
+        !audioBuffer.updating &&
+        !appendingVideo &&
+        !appendingAudio;
+
+    if (videoEnded && audioEnded && buffersIdle) {
+        if (mediaSource.readyState === "open") {
+            console.log("Fim do vídeo e do áudio");
+            mediaSource.endOfStream();
+        }
+    }
+}
 
 loadManifest();
-
-
-// const video = document.getElementById("video-player");
-
-// const params = new URLSearchParams(window.location.search);
-// const videoId = params.get("id");
-
-// console.log("videoId:", videoId);
-// let segments = [];
-// let current = 0;
-
-// // carrega o manifesto
-// async function loadManifest() {
-
-//     const response = await fetch(`/manifest?id=${videoId}`);
-//     console.log("manifest:", videoId);
-
-//     const manifest = await response.json();
-
-//     segments = manifest.segments.map(
-//         segment =>  `/stream?id=${videoId}&segment=${segment}`
-//     );
-
-//     console.log("Manifest carregado:", segments);
-
-//     playSegment(current);
-// }
-
-// // toca um segmento
-// function playSegment(index) {
-
-//     if (index >= segments.length) {
-//         console.log("Fim do vídeo");
-//         return;
-//     }
-
-//     video.src = segments[index];
-
-//     video.load();
-
-//     video.play();
-
-//     console.log("Reproduzindo:", segments[index]);
-// }
-
-// // quando acabar um segmento → toca o próximo
-// video.addEventListener("ended", () => {
-
-//     current++;
-
-//     playSegment(current);
-// });
-
-// // inicia lendo o manifesto
-// loadManifest();
