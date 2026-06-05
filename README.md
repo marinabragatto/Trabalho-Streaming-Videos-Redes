@@ -21,7 +21,8 @@ go fecthVideo()
 ```
 Esta função, por sua vez, rquisita do servidor primeiramente o manifesto, para que possa ler os segmentos, e a apartir disso requisita os segmentos, um a um para que possa rodá-los um seguido do outro.
 
-Agora utilizamos a API MediaSource para contolar o fluxo dos vídeos, ela lê:
+
+### Agora utilizamos a API MediaSource para contolar o fluxo dos vídeos, ela lê:
 * um arquivo de inicialização (init-stream0.mp4)
 * múltiplos segmentos .m4s
 E controla por conta própria qual pedaço será transmitido.
