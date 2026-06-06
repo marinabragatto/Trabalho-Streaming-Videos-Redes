@@ -28,5 +28,23 @@
     "nome": "Backrooms",
     "manifest": "manifest5.mp4",
     "thumbnail": "thumbnail5.jpg"
+  },
+  {
+    "id": 6,
+    "nome": "Mestres do Universo",
+    "manifest": "manifest6.mp4",
+    "thumbnail": "thumbnail6.jpg"
+  },
+  {
+    "id": 7,
+    "nome": "Supergirl",
+    "manifest": "manifest7.mp4",
+    "thumbnail": "thumbnail7.jpg"
+  },
+  {
+    "id": 8,
+    "nome": "Moana",
+    "manifest": "manifest8.mp4",
+    "thumbnail": "thumbnail8.jpg"
   }
 ]

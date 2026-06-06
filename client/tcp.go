@@ -16,7 +16,6 @@ import (
 func DownloadData(conn net.Conn) ([]byte, error){
 	connReader := bufio.NewReader(conn) // Reader da conexao
 	msg, _ := connReader.ReadString('\n') // lê READY ou ERROR
-	fmt.Println("opaaa"+msg)
 	msg = strings.TrimSpace(msg)
 	
 	if msg == "ERROR" {
@@ -48,8 +47,8 @@ func DownloadData(conn net.Conn) ([]byte, error){
 
 
 func DoRequestGetManifest(video_id int) ([]byte, error) {
-	conn, err := net.Dial("tcp", "192.168.15.7:8080")
-	// conn, err := net.Dial("tcp", "localhost:8080")
+	// conn, err := net.Dial("tcp", "192.168.15.7:8080") # tem que colocar o que @Thais falou!
+	conn, err := net.Dial("tcp", "localhost:8080")
 	if err != nil {
 		fmt.Println("Erro ao se conectar no servidor: ", err)
 		return nil, err
@@ -60,14 +59,15 @@ func DoRequestGetManifest(video_id int) ([]byte, error) {
 	return DownloadData(conn)
 }
 
-func DoRequestGetSegment(video_id int, segment string) ([]byte, error) {
-	conn, err := net.Dial("tcp", "localhost:8080")
+func DoRequestGetSegment(video_id int, quality int, segment string) ([]byte, error) {
+	conn, err := net.Dial("tcp", "localhost:8080") 
 	if err != nil {
 		fmt.Println("Erro ao se conectar no servidor: ", err)
 		return nil, err
 	}
 	_, err = conn.Write([]byte(strconv.Itoa(GET_SEGMENT) + "\n"))
 	_, err = conn.Write([]byte(strconv.Itoa(video_id) + "\n"))
+	_, err = conn.Write([]byte(strconv.Itoa(quality) + "\n"))
 	_, err = conn.Write([]byte(segment + "\n")) // Envia a mensagem de um segmentos desejado para o servidor
 
 	return DownloadData(conn)

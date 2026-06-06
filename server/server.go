@@ -31,7 +31,7 @@ type Video struct {
 	Manifest  string `json:"manifest"`
 }
 
-const num_videos int = 5
+const num_videos int = 8
 
 func Serve() {
 
@@ -52,7 +52,7 @@ func Serve() {
 		fmt.Println("Erro ao ler JSON", err)
 		return
 	}
-	imprime_videos(videos)
+	// imprime_videos(videos)
 
 	// Listener : interface objeto que escuta conexões
 	listener, err := net.Listen("tcp", "0.0.0.0:8080") // Cria socket tcp
@@ -99,57 +99,20 @@ func imprime_videos(videos []Video) {
 	}
 }
 
-func handleConnection(conn net.Conn, videos []Video) {
-	defer conn.Close()
-	reader := bufio.NewReader(conn)
-	fmt.Print("Nova Conexão\n")
-	// Considerando que o cliente envia no formato .mp4 :
-	//trailer_michael.mp4\n
-	//(o cliente DEVE enviar o \n)
-	request, _ := reader.ReadString('\n')
-	request = strings.TrimSpace(request)
-	request_type, _ := strconv.Atoi(request)
-
-	if request_type == LIST_VIDEOS {
+func requestListVideos(videos []Video, conn net.Conn){
 
 		data, err := json.Marshal(videos)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
+
 		conn.Write([]byte("READY\n"))
 		conn.Write([]byte(fmt.Sprintf("%d\n", len(data))))
 		conn.Write(data) // deveria segmentar?
-		return
-	}
+}
 
-	path := ""
-	video_id, _ := reader.ReadString('\n') //lendo o video id
-	video_id = strings.TrimSpace(video_id)
-	video_id_num, _ := strconv.Atoi(video_id)
-
-	if video_id_num > num_videos || video_id_num <= 0 { // o video eh de id que nao se conhece
-		fmt.Print("Erro: não existe esse arquivo na base de dados\n")
-		conn.Write([]byte("ERROR\n"))
-		return
-	}
-
-	if request_type == GET_MANIFEST {
-		path = "./videos/" + video_id + "/manifest.json" // Caminho até a pasta de arquivos do servidor
-	}
-
-	if request_type == GET_THUMBNAIL {
-		path = "./thumbnails/" + video_id + ".jpg" // Caminho até a pasta de arquivos do servidor
-
-	}
-	if request_type == GET_SEGMENT {
-		nome_seg, _ := reader.ReadString('\n')
-		nome_seg = strings.TrimSpace(nome_seg)
-
-		path = "./videos/" + video_id + "/" + nome_seg // Caminho até a pasta de arquivos do servidor
-
-	}
-
+func requestGet(path string, conn net.Conn){
 	fmt.Println("\tVídeo Solicitado: " + path) // Imprime o pedido desejado no terminal do servidor
 
 	file, err := os.Open(path)
@@ -179,5 +142,50 @@ func handleConnection(conn net.Conn, videos []Video) {
 	}
 
 	fmt.Println("\tArquivo enviado: ", path)
+}
+func handleConnection(conn net.Conn, videos []Video) {
+	defer conn.Close()
+	reader := bufio.NewReader(conn)
+	fmt.Print("Nova Conexão\n")
+	
+	request, _ := reader.ReadString('\n')
+	request = strings.TrimSpace(request)
+	request_type, _ := strconv.Atoi(request)
 
+	if request_type == LIST_VIDEOS {
+		requestListVideos(videos, conn)
+		return
+	}
+
+	path := ""
+	video_id, _ := reader.ReadString('\n') //lendo o video id
+	video_id = strings.TrimSpace(video_id)
+	video_id_num, _ := strconv.Atoi(video_id)
+
+	if video_id_num > num_videos || video_id_num <= 0 { // o video eh de id que nao se conhece
+		fmt.Print("Erro: não existe esse arquivo na base de dados\n")
+		conn.Write([]byte("ERROR\n"))
+		return
+	}
+
+	if request_type == GET_MANIFEST {
+
+		path = "./videos/" + video_id + "/manifest.json" // Caminho até a pasta de arquivos do servidor
+	}
+	if request_type == GET_THUMBNAIL {
+		path = "./thumbnails/" + video_id + ".jpg" // Caminho até a pasta de arquivos do servidor
+	}
+	if request_type == GET_SEGMENT {
+		quality, _ := reader.ReadString('\n') //lendo o video id
+		quality = strings.TrimSpace(quality)
+
+		nome_seg, _ := reader.ReadString('\n')
+		nome_seg = strings.TrimSpace(nome_seg)
+
+		path = "./videos/" + video_id + "/" + quality +  "/"+ nome_seg // Caminho até a pasta de arquivos do servidor
+		fmt.Println(path)
+	}
+	
+	
+	requestGet(path, conn)
 }

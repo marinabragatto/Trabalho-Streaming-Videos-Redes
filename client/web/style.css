@@ -72,8 +72,14 @@ body{
     padding: 0;
 }
 
-.logo-title{
+.logo-title {
     color: rgb(232, 202, 202);
+    text-decoration: none;
+}
+
+.logo-title a {
+    color: rgb(232, 202, 202);
+    text-decoration: none;
 }
 
 .header{
@@ -104,3 +110,23 @@ body{
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 3rem 1rem;
 }
+.controls{
+    color: rgb(232, 202, 202);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 2rem;
+}
+#quality-select{
+    justify-content: center;
+    background-color: #1f1f1f;
+    color: rgb(232, 202, 202);
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+

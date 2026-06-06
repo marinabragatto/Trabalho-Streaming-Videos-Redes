@@ -12,14 +12,26 @@
 
     <body>
             
-          <header class="header">
-            <h2 class="logo-title"> MarTha </h2>
+        <header class="header">
+            <h2 class="logo-title"> 
+                <a href="index.html">MarTha</a>
+
+            </h2>
         </header>
+
+        <div class = "controls">
+            <label for="quality-select">Qualidade:</label>
+            <select id = "quality-select">
+                <option value = "1080">1080p</option>
+                <option value = "720">720p</option>
+                <option value = "480">480p</option>
+                <option value = "360">360p</option>
+            </select>
+        </div>   
+        <div class="video-player">
+            <video id="video-player" controls width="800" preload="auto"></video>
         
-      <div class="video-player">
-        <video id="video-player" controls width="800" preload="auto"></video>
-        
-    </div>
+        </div>
 
         </div>
      <script src="video.js"></script>

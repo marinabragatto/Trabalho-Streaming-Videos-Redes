@@ -7,6 +7,19 @@ const video = document.getElementById("video-player");
 const params = new URLSearchParams(window.location.search);
 const videoId = params.get("id");
 
+// Controle de qualidade
+const qualitySelect = document.getElementById("quality-select");
+
+const quality = params.get("quality") || "1080";
+
+qualitySelect.value = quality;
+qualitySelect.addEventListener("change", () => {
+
+    params.set("quality", qualitySelect.value);
+
+    window.location.search = params.toString();
+});
+
 // MediaSource é a fonte de mídia controlada pelo JavaScript
 let mediaSource;
 
@@ -137,7 +150,10 @@ async function appendNextAudioSegment() {
 // Busca um segmento no backend Go.
 // O backend usa TCP para buscar no servidor e devolve os bytes ao navegador.
 async function fetchSegment(segmentName) {
-    const url = `/stream?id=${videoId}&segment=${segmentName}`;
+    const url = 
+    `/stream?id=${videoId}` + 
+    `&quality=${quality}` +
+    `&segment=${segmentName}`;
     console.log("Carregando:", url);
 
     const response = await fetch(url);

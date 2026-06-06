@@ -59,14 +59,15 @@ func VideoHandler(w http.ResponseWriter, r *http.Request) {
 
 func StreamHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Rota Stream!")
-
+	quality := r.URL.Query().Get("quality") 
+	quality_int, _ := strconv.Atoi(quality)
 	segment := r.URL.Query().Get("segment")
 	fmt.Println("SEGMENTO + ", segment)
 	id := r.URL.Query().Get("id")
 	id_int, _ := strconv.Atoi(id)
 	fmt.Println("(" + segment + ")")
 
-	data, err := DoRequestGetSegment(id_int, segment)
+	data, err := DoRequestGetSegment(id_int, quality_int, segment)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
