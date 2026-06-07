@@ -82,22 +82,23 @@ body{
     text-decoration: none;
 }
 
+
 .header{
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     padding: 0.5rem;
     border-bottom: 2px solid #555050;
-
 }
+
 .video-player{
     display: flex;
     justify-content: center;
-
+    margin-top: 15px;
 }
 .video-player video {
     width: 80%;
-    max-width: 1200px;
+    max-width: 1000px;
     border-radius: 12px;
 
     box-shadow:
@@ -113,10 +114,11 @@ body{
 .controls{
     color: rgb(232, 202, 202);
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     gap: 0.8rem;
-    margin-top: 2rem;
+    margin-top: -40px;
+    margin-left: 145px;
 }
 #quality-select{
     justify-content: center;
@@ -128,5 +130,6 @@ body{
     font-size: 1rem;
     cursor: pointer;
     box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    margin-top: -5px;
 }
 
