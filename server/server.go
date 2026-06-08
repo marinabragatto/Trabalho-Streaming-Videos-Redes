@@ -52,7 +52,6 @@ func Serve() {
 		fmt.Println("Erro ao ler JSON", err)
 		return
 	}
-	// imprime_videos(videos)
 
 	// Listener : interface objeto que escuta conexões
 	listener, err := net.Listen("tcp", "0.0.0.0:8080") // Cria socket tcp
@@ -73,7 +72,7 @@ func Serve() {
 			continue
 		}
 
-		go handleConnection(conn, videos)
+		go handleConnection(conn, videos) // Thread para cliente
 	}
 }
 
@@ -81,8 +80,6 @@ func Serve() {
 /*
 FORMATO DE LEITURA DE CONEXÃO (PROTOCOLO):
   .1	Servidor recebe o tipo de REQUEST
-  .1	Servidor recebe do cliente o nome do arquivo:
-			nome.mp4\n
   .2	Se existe o arquivo:
 			READY\n
 			SIZE\n (o size é um int)

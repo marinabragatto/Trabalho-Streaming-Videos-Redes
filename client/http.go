@@ -13,7 +13,7 @@ import (
 var ip string
 
 func ReadIP() string {
-	fmt.Print("Digite aqui seu IP: ")
+	fmt.Print("Digite aqui o IP do seu SERVIDOR TCP: ")
 
 	reader := bufio.NewReader(os.Stdin)
 

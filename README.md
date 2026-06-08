@@ -70,6 +70,6 @@ Em um outro terminal, execute:
 ```bash
 go run mainClient.go
 ```
-* Em seguida, digite seu IP, no formato (###.###.###..)
+* Em seguida, digite o IP do SERVIDOR TCP, no formato (###.###.###..)
 * Abra seu navegador em http://localhost:3000
 
