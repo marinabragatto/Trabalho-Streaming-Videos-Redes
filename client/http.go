@@ -1,14 +1,37 @@
 package client
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 )
 
+var ip string
+
+func ReadIP() string {
+	fmt.Print("Digite aqui seu IP: ")
+
+	reader := bufio.NewReader(os.Stdin)
+
+	ip, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Println("Erro ao ler IP:", err)
+		return ""
+	}
+	ip = strings.TrimSpace(ip)
+	return ip
+}
+
 func StartHTTPServer() {
+
+	ip = ReadIP()
+	if ip == "" {
+		return
+	}
 
 	mux := http.NewServeMux()
 
@@ -25,7 +48,7 @@ func StartHTTPServer() {
 	// Rota para a Thumbnail
 	mux.HandleFunc("/thumbnail", ThumbnailHandler)
 
-	fmt.Println("Servidor HTTP iniciado em http://localhost:3000/")
+	fmt.Printf("Servidor HTTP iniciado em http://%s:3000/\n", ip)
 	srv := &http.Server{
 		Addr:    "0.0.0.0:3000",
 		Handler: mux,
@@ -41,7 +64,7 @@ func StartHTTPServer() {
 
 func CatalogoHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Rota Catalogo")
-	data, err := DoRequestListVideos()
+	data, err := DoRequestListVideos(ip)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -59,7 +82,7 @@ func VideoHandler(w http.ResponseWriter, r *http.Request) {
 
 func StreamHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Rota Stream!")
-	quality := r.URL.Query().Get("quality") 
+	quality := r.URL.Query().Get("quality")
 	quality_int, _ := strconv.Atoi(quality)
 	segment := r.URL.Query().Get("segment")
 	fmt.Println("SEGMENTO + ", segment)
@@ -67,7 +90,7 @@ func StreamHandler(w http.ResponseWriter, r *http.Request) {
 	id_int, _ := strconv.Atoi(id)
 	fmt.Println("(" + segment + ")")
 
-	data, err := DoRequestGetSegment(id_int, quality_int, segment)
+	data, err := DoRequestGetSegment(id_int, quality_int, segment, ip)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -85,7 +108,7 @@ func ManifestHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	id_int, _ := strconv.Atoi(id)
 
-	data, err := DoRequestGetManifest(id_int)
+	data, err := DoRequestGetManifest(id_int, ip)
 
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -101,7 +124,7 @@ func ThumbnailHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	id_int, err := strconv.Atoi(id)
 
-	data, err := DoRequestGetThumbnail(id_int)
+	data, err := DoRequestGetThumbnail(id_int, ip)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

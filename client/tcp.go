@@ -5,19 +5,15 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	// "net/http/cookiejar"
-
-	// "os"
 	"strconv"
 	"strings"
 )
 
-
-func DownloadData(conn net.Conn) ([]byte, error){
-	connReader := bufio.NewReader(conn) // Reader da conexao
+func DownloadData(conn net.Conn) ([]byte, error) {
+	connReader := bufio.NewReader(conn)   // Reader da conexao
 	msg, _ := connReader.ReadString('\n') // lê READY ou ERROR
 	msg = strings.TrimSpace(msg)
-	
+
 	if msg == "ERROR" {
 		err := errors.New("Operação não existe no servidor!")
 		fmt.Println(err)
@@ -44,11 +40,9 @@ func DownloadData(conn net.Conn) ([]byte, error){
 	return buffer, nil
 }
 
+func DoRequestGetManifest(video_id int, ip string) ([]byte, error) {
+	conn, err := net.Dial("tcp", ip+":8080")
 
-
-func DoRequestGetManifest(video_id int) ([]byte, error) {
-	// conn, err := net.Dial("tcp", "192.168.15.7:8080") # tem que colocar o que @Thais falou!
-	conn, err := net.Dial("tcp", "localhost:8080")
 	if err != nil {
 		fmt.Println("Erro ao se conectar no servidor: ", err)
 		return nil, err
@@ -59,8 +53,9 @@ func DoRequestGetManifest(video_id int) ([]byte, error) {
 	return DownloadData(conn)
 }
 
-func DoRequestGetSegment(video_id int, quality int, segment string) ([]byte, error) {
-	conn, err := net.Dial("tcp", "localhost:8080") 
+func DoRequestGetSegment(video_id int, quality int, segment string, ip string) ([]byte, error) {
+	conn, err := net.Dial("tcp", ip+":8080")
+
 	if err != nil {
 		fmt.Println("Erro ao se conectar no servidor: ", err)
 		return nil, err
@@ -73,21 +68,22 @@ func DoRequestGetSegment(video_id int, quality int, segment string) ([]byte, err
 	return DownloadData(conn)
 }
 
-func DoRequestGetThumbnail(video_id int) ([]byte, error) {
-	conn, err := net.Dial("tcp", "localhost:8080")
+func DoRequestGetThumbnail(video_id int, ip string) ([]byte, error) {
+	conn, err := net.Dial("tcp", ip+":8080")
+
 	if err != nil {
 		fmt.Println("Erro ao se conectar no servidor: ", err)
 		return nil, err
 	}
 	_, err = conn.Write([]byte(strconv.Itoa(GET_THUMBNAIL) + "\n"))
 	_, err = conn.Write([]byte(strconv.Itoa(video_id) + "\n"))
-	
+
 	return DownloadData(conn)
 }
 
-func DoRequestListVideos() ([]byte, error) {
+func DoRequestListVideos(ip string) ([]byte, error) {
+	conn, err := net.Dial("tcp", ip+":8080")
 
-	conn, err := net.Dial("tcp", "localhost:8080")
 	if err != nil {
 		fmt.Println("Erro ao se conectar no servidor: ", err)
 		return nil, err
@@ -103,7 +99,5 @@ func DoRequestListVideos() ([]byte, error) {
 	}
 
 	return DownloadData(conn)
-	
+
 }
-
-

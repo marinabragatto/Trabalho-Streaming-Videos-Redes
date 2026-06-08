@@ -2,14 +2,13 @@ package client
 
 import (
 	"encoding/json"
-	// "os"
 )
 
 type Manifest struct {
 	Segments []string `json:"segments"`
 }
 
-func ReadManifest(buffer []byte) ([]string, error){
+func ReadManifest(buffer []byte) ([]string, error) {
 
 	var manifest Manifest
 
