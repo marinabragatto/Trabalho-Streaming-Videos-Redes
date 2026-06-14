@@ -144,7 +144,7 @@ function startMediaSource() {
             currentAudioSegment = segmentIndex; 
             
 
-            //carrega os 4 proximos seguimentos a partir do definido pelo index
+            //carrega os 6 proximos seguimentos a partir do definido pelo index
             //"carga inicial"
             for (let i = 0; i < 6; i++) {
                 console.log("CARREGANDO OUTROS SEGUIMENTOS");
