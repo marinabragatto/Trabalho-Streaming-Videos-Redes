@@ -51,10 +51,6 @@ Os vídeos são convertidos pelo FFmpeg utilizando o codec __*H.264*__ para víd
 * Bufferização contínua utilizando MediaSource
 * Suporte a múltiplos clientes simultâneos através de goroutines
 
-## Melhorias futuras 
-* Implementação de sincronização durante a troca de qualidade do vídeo, permitindo que a reprodução continue a partir do ponto exato em que estava antes da alteração de resolução, proporcionando uma experiência mais fluida ao usuário
-* Realização testes de carga e desempenho para dimensionar a capacidade do sistema, avaliando a quantidade de clientes simultâneos suportados e o comportamento da aplicação sob diferentes condições de uso.
-
 ## Como executar
 Como o github não permite envio de arquivos longos, colocamos os vídeos disponíveis em uma pasta que precisa ser baixada.
 >[Link Drive](https://drive.google.com/drive/folders/1pEeOQyyr_Tj7p_rU8H4X5jHdGcassdZm?usp=sharing)
