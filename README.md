@@ -79,6 +79,7 @@ go run mainClient.go
 | 5000 | 5000 | 0 | 389.430028ms | 11.2% |
 | 10000 | 10000 | 0 | 428.165226ms | 18.55% |
 | 20000 | 20000 | 0 | 1.329195188s | 27.72% |
+
 Essa métrica foi obtida por meio de rodar o código *testHome.go*. Ela representa um número variável de clientes fazendo uma requisição, para o servidor TCP, dos dados da página inicial.
 
 > **OBS:** Para reproduzir os resultados, basta em um terminal colocar em execução o *mainServer.go* e em outro terminal *testHome.go*.
@@ -92,6 +93,7 @@ Essa métrica foi obtida por meio de rodar o código *testHome.go*. Ela represen
 | 100 | 100 | 0 | 56.093886739s |
 | 200 | 200 | 0 | 1m38.160635299s |
 | 300 | 300 | 0 | 2m30.076559992s | 
+
 O código *testVideo.go* foi utilizado para simular múltiplos clientes simultâneos acessando o sistema. Cada cliente realiza a solicitação do manifesto do vídeo de identificador id=1 ao servidor TCP e, em seguida, solicita todos os segmentos de vídeo e áudio descritos no manifesto, reproduzindo o comportamento do cliente utilizado pelo sistema de streaming.
 
 Os resultados demonstram que o servidor foi capaz de atender 300 clientes simultâneos sem apresentar falhas de comunicação ou transferência de dados, mantendo taxa de sucesso de 100% em todos os cenários avaliados. Observa-se, entretanto, um aumento progressivo no tempo total de execução conforme o número de clientes cresce, comportamento esperado devido ao aumento da carga de processamento e do número de conexões concorrentes.
