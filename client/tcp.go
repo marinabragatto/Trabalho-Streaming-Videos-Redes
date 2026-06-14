@@ -91,7 +91,7 @@ func DoRequestListVideos(ip string) ([]byte, error) {
 	defer conn.Close()
 
 	_, err = conn.Write([]byte(strconv.Itoa(LIST_VIDEOS) + "\n"))
-	fmt.Println(LIST_VIDEOS)
+	// fmt.Println(LIST_VIDEOS)
 	if err != nil {
 		fmt.Println("\tFalha ao enviar Operação Desejada")
 		conn.Close()
